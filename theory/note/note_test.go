@@ -32,18 +32,14 @@ func TestNew(t *testing.T) {
 		{"Ab7", Note{natural.NewNaturalTestHelper("A", t), 7, -1}},
 	}
 	for _, test := range table {
-		actual, err := New(test.in)
-		if err != nil {
-			t.Logf("with %s, got error %s, expected %v", test.in, err, test.expected)
-			t.FailNow()
-		}
+		actual, _ := New(test.in)
 		if actual != test.expected {
 			t.Errorf("with %s, got %v, expected %v", test.in, actual, test.expected)
 		}
 	}
 }
 
-func TestNewFailsOnInvalidName(t *testing.T) {
+func TestNew_FailsOnInvalidName(t *testing.T) {
 	table := []string{
 		"A",
 		"A-1",
@@ -61,6 +57,74 @@ func TestNewFailsOnInvalidName(t *testing.T) {
 		_, err := New(invalidNote)
 		if err == nil {
 			t.Errorf("with %s, got nil error, expected non-nil error", invalidNote)
+		}
+	}
+}
+
+func TestNewFromParams(t *testing.T) {
+	table := []struct {
+		natural    string
+		octave     int
+		accidental int
+		expected   Note
+	}{
+		{"A", 0, 0, Note{natural.NewNaturalTestHelper("A", t), 0, 0}},
+		{"B", 1, -1, Note{natural.NewNaturalTestHelper("B", t), 1, -1}},
+		{"B", 1, 0, Note{natural.NewNaturalTestHelper("B", t), 1, 0}},
+		{"B", 1, 1, Note{natural.NewNaturalTestHelper("B", t), 1, 1}},
+		{"C", 2, -1, Note{natural.NewNaturalTestHelper("C", t), 2, -1}},
+		{"C", 2, 0, Note{natural.NewNaturalTestHelper("C", t), 2, 0}},
+		{"C", 2, 1, Note{natural.NewNaturalTestHelper("C", t), 2, 1}},
+		{"D", 3, -1, Note{natural.NewNaturalTestHelper("D", t), 3, -1}},
+		{"D", 3, 0, Note{natural.NewNaturalTestHelper("D", t), 3, 0}},
+		{"D", 3, 1, Note{natural.NewNaturalTestHelper("D", t), 3, 1}},
+		{"E", 4, -1, Note{natural.NewNaturalTestHelper("E", t), 4, -1}},
+		{"E", 4, 0, Note{natural.NewNaturalTestHelper("E", t), 4, 0}},
+		{"E", 4, 1, Note{natural.NewNaturalTestHelper("E", t), 4, 1}},
+		{"F", 5, -1, Note{natural.NewNaturalTestHelper("F", t), 5, -1}},
+		{"F", 5, 0, Note{natural.NewNaturalTestHelper("F", t), 5, 0}},
+		{"F", 5, 1, Note{natural.NewNaturalTestHelper("F", t), 5, 1}},
+		{"G", 6, -1, Note{natural.NewNaturalTestHelper("G", t), 6, -1}},
+		{"G", 6, 0, Note{natural.NewNaturalTestHelper("G", t), 6, 0}},
+		{"G", 6, 1, Note{natural.NewNaturalTestHelper("G", t), 6, 1}},
+		{"A", 7, -1, Note{natural.NewNaturalTestHelper("A", t), 7, -1}},
+	}
+	for _, test := range table {
+		nat := natural.NewNaturalTestHelper(test.natural, t)
+		actual, _ := NewFromParams(nat, test.octave, test.accidental)
+		if actual != test.expected {
+			t.Logf(
+				"with %s, %d and %d, got error %v, expected %v",
+				test.natural,
+				test.octave,
+				test.accidental,
+				actual,
+				test.expected,
+			)
+		}
+	}
+}
+
+func TestNewFromParams_FailsOnInvalidParams(t *testing.T) {
+	table := []struct {
+		natural    string
+		octave     int
+		accidental int
+	}{
+		{"A", -1, 0},
+		{"A", 3, -2},
+		{"A", 3, 2},
+	}
+	for _, test := range table {
+		nat := natural.NewNaturalTestHelper(test.natural, t)
+		_, err := NewFromParams(nat, test.octave, test.accidental)
+		if err == nil {
+			t.Errorf(
+				"with %s, %d and %d, got nil error, expected non-nil error",
+				test.natural,
+				test.octave,
+				test.accidental,
+			)
 		}
 	}
 }
@@ -210,7 +274,7 @@ func TestNote_AddSemitone(t *testing.T) {
 		{NewHelper("Gb3", t), NewHelper("G3", t)},
 	}
 	for _, test := range table {
-		actual := test.note.AddSemitone()
+		actual, _ := test.note.addSemitone()
 		if test.expected != actual {
 			t.Errorf(
 				"from %v, got %v, expected %v",
@@ -248,7 +312,7 @@ func TestNote_SubtractSemitone(t *testing.T) {
 		{NewHelper("G#3", t), NewHelper("G3", t)},
 	}
 	for _, test := range table {
-		actual := test.note.SubtractSemitone()
+		actual, _ := test.note.SubtractSemitone()
 		if test.expected != actual {
 			t.Errorf(
 				"from %v, got %v, expected %v",
@@ -257,6 +321,13 @@ func TestNote_SubtractSemitone(t *testing.T) {
 				test.expected,
 			)
 		}
+	}
+}
+
+func TestNote_SubtractSemitone_FailsIfOutOfRange(t *testing.T) {
+	Ab0 := NewHelper("Ab0", t)
+	if _, err := Ab0.SubtractSemitone(); err == nil {
+		t.Errorf("with %v, got error %v, expected non-nil error", Ab0.GetName(), err)
 	}
 }
 
@@ -293,7 +364,7 @@ func TestNote_AddSemitones(t *testing.T) {
 		{NewHelper("C3", t), -12, NewHelper("C2", t)},
 	}
 	for _, test := range table {
-		actual := test.note.AddSemitones(test.semitones)
+		actual, _ := test.note.AddSemitones(test.semitones)
 		if test.expected != actual {
 			t.Errorf(
 				"from %v and %d, got %v, expected %v",
@@ -303,6 +374,13 @@ func TestNote_AddSemitones(t *testing.T) {
 				test.expected,
 			)
 		}
+	}
+}
+
+func TestNote_AddSemitones_FailsIfOutOfRange(t *testing.T) {
+	A0 := NewHelper("A0", t)
+	if _, err := A0.AddSemitones(-5); err == nil {
+		t.Errorf("with %v, got error %v, expected non-nil error", A0.GetName(), err)
 	}
 }
 

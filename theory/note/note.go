@@ -39,60 +39,69 @@ func (n Note) semitones() int {
 	return 12*n.octave + semitones + n.accidental
 }
 
-func (n Note) AddSemitone() Note {
-	note := n
-	switch n.accidental {
+func (n Note) addSemitone() (Note, error) {
+	nat := n.natural
+	octave := n.octave
+	accidental := n.accidental
+	switch accidental {
 	case 0:
-		if note.natural.SemitonesToNext() == 2 {
-			note.accidental = 1
+		if nat.SemitonesToNext() == 2 {
+			accidental = 1
 			break
 		}
 		fallthrough
 	case 1:
-		note.natural, _ = n.natural.Next()
-		if note.natural.IsA() {
-			note.octave += 1
+		nat, _ = n.natural.Next()
+		if nat.IsA() {
+			octave += 1
 		}
 		fallthrough
 	case -1:
-		note.accidental = 0
+		accidental = 0
 	}
-	return note
+	return NewFromParams(nat, octave, accidental)
 }
 
-func (n Note) SubtractSemitone() Note {
-	note := n
-	switch n.accidental {
+func (n Note) SubtractSemitone() (Note, error) {
+	nat := n.natural
+	octave := n.octave
+	accidental := n.accidental
+	switch accidental {
 	case 0:
-		if note.natural.SemitonesFromPrev() == 2 {
-			note.accidental = -1
+		if nat.SemitonesFromPrev() == 2 {
+			accidental = -1
 			break
 		}
 		fallthrough
 	case -1:
-		note.natural, _ = n.natural.Prev()
-		if n.natural.IsA() {
-			note.octave -= 1
+		if nat.IsA() {
+			octave -= 1
 		}
+		nat, _ = n.natural.Prev()
 		fallthrough
 	case 1:
-		note.accidental = 0
+		accidental = 0
 	}
-	return note
+	return NewFromParams(nat, octave, accidental)
 }
 
-func (n Note) AddSemitones(semitones int) Note {
+func (n Note) AddSemitones(semitones int) (Note, error) {
 	note := n
+	var err error
 	if semitones >= 0 {
 		for st := 1; st <= semitones; st++ {
-			note = note.AddSemitone()
+			if note, err = note.addSemitone(); err != nil {
+				break
+			}
 		}
 	} else {
 		for st := -1; st >= semitones; st-- {
-			note = note.SubtractSemitone()
+			if note, err = note.SubtractSemitone(); err != nil {
+				break
+			}
 		}
 	}
-	return note
+	return note, err
 }
 
 func New(name string) (Note, error) {
@@ -131,4 +140,16 @@ func New(name string) (Note, error) {
 		octave:     octave,
 		accidental: accidental,
 	}, nil
+}
+
+func NewFromParams(n natural.Natural, octave, accidental int) (Note, error) {
+	if octave < 0 || accidental < -1 || accidental > 1 {
+		return Note{}, fmt.Errorf(
+			"cannot create note with natural %v, octave %d and accidental %d",
+			n,
+			octave,
+			accidental,
+		)
+	}
+	return Note{natural: n, octave: octave, accidental: accidental}, nil
 }
