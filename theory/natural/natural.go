@@ -78,6 +78,20 @@ func (n Natural) SemitonesFromPrev() int {
 	return n.SemitonesBasedOn(n.Prev())
 }
 
+func (n Natural) AddIntervalSize(distance int) Natural {
+	// Find natural position
+	for pos, name := range naturalsNames {
+		if name == n.name {
+			pos = (pos + distance) % len(naturalsNames)
+			if pos < 0 {
+				pos += len(naturalsNames)
+			}
+			return naturals[naturalsNames[pos]]
+		}
+	}
+	panic(fmt.Sprintf("cannot add interval size distance %d to natural %v", distance, n))
+}
+
 func (n Natural) IsA() bool {
 	return n.name == "A"
 }

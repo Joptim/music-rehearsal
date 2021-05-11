@@ -189,6 +189,43 @@ func TestNatural_GetName(t *testing.T) {
 	}
 }
 
+func TestNatural_AddIntervalSize(t *testing.T) {
+	table := []struct {
+		natural  string
+		size     int
+		expected string
+	}{
+		{"C", 0, "C"},
+		{"C", 1, "D"},
+		{"C", 2, "E"},
+		{"C", 3, "F"},
+		{"C", 4, "G"},
+		{"C", 5, "A"},
+		{"C", 6, "B"},
+		{"C", 7, "C"},
+		{"C", -1, "B"},
+		{"C", -2, "A"},
+		{"C", -3, "G"},
+		{"C", -4, "F"},
+		{"C", -5, "E"},
+		{"C", -6, "D"},
+		{"C", -7, "C"},
+	}
+	for _, test := range table {
+		natural := NewTestHelper(test.natural, t)
+		actual := natural.AddIntervalSize(test.size)
+		if actual.GetName() != test.expected {
+			t.Logf(
+				"with %s an %d, got %s, expected %s",
+				test.natural,
+				test.size,
+				actual.GetName(),
+				test.expected,
+			)
+		}
+	}
+}
+
 func TestNatural_IsA(t *testing.T) {
 	table := []struct {
 		name     string
