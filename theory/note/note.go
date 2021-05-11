@@ -51,7 +51,7 @@ func (n Note) addSemitone() (Note, error) {
 		}
 		fallthrough
 	case 1:
-		nat, _ = n.natural.Next()
+		nat = n.natural.Next()
 		if nat.IsA() {
 			octave += 1
 		}
@@ -77,7 +77,7 @@ func (n Note) SubtractSemitone() (Note, error) {
 		if nat.IsA() {
 			octave -= 1
 		}
-		nat, _ = n.natural.Prev()
+		nat = n.natural.Prev()
 		fallthrough
 	case 1:
 		accidental = 0
@@ -115,7 +115,7 @@ func New(name string) (Note, error) {
 	}
 
 	// Natural
-	nat, err := natural.NewNatural(match[1])
+	nat, err := natural.New(match[1])
 	if err != nil {
 		return Note{}, err
 	}

@@ -10,26 +10,26 @@ func TestNew(t *testing.T) {
 		in       string
 		expected Note
 	}{
-		{"A0", Note{natural.NewNaturalTestHelper("A", t), 0, 0}},
-		{"Bb1", Note{natural.NewNaturalTestHelper("B", t), 1, -1}},
-		{"B1", Note{natural.NewNaturalTestHelper("B", t), 1, 0}},
-		{"B#1", Note{natural.NewNaturalTestHelper("B", t), 1, 1}},
-		{"Cb2", Note{natural.NewNaturalTestHelper("C", t), 2, -1}},
-		{"C2", Note{natural.NewNaturalTestHelper("C", t), 2, 0}},
-		{"C#2", Note{natural.NewNaturalTestHelper("C", t), 2, 1}},
-		{"Db3", Note{natural.NewNaturalTestHelper("D", t), 3, -1}},
-		{"D3", Note{natural.NewNaturalTestHelper("D", t), 3, 0}},
-		{"D#3", Note{natural.NewNaturalTestHelper("D", t), 3, 1}},
-		{"Eb4", Note{natural.NewNaturalTestHelper("E", t), 4, -1}},
-		{"E4", Note{natural.NewNaturalTestHelper("E", t), 4, 0}},
-		{"E#4", Note{natural.NewNaturalTestHelper("E", t), 4, 1}},
-		{"Fb5", Note{natural.NewNaturalTestHelper("F", t), 5, -1}},
-		{"F5", Note{natural.NewNaturalTestHelper("F", t), 5, 0}},
-		{"F#5", Note{natural.NewNaturalTestHelper("F", t), 5, 1}},
-		{"Gb6", Note{natural.NewNaturalTestHelper("G", t), 6, -1}},
-		{"G6", Note{natural.NewNaturalTestHelper("G", t), 6, 0}},
-		{"G#6", Note{natural.NewNaturalTestHelper("G", t), 6, 1}},
-		{"Ab7", Note{natural.NewNaturalTestHelper("A", t), 7, -1}},
+		{"A0", Note{natural.NewTestHelper("A", t), 0, 0}},
+		{"Bb1", Note{natural.NewTestHelper("B", t), 1, -1}},
+		{"B1", Note{natural.NewTestHelper("B", t), 1, 0}},
+		{"B#1", Note{natural.NewTestHelper("B", t), 1, 1}},
+		{"Cb2", Note{natural.NewTestHelper("C", t), 2, -1}},
+		{"C2", Note{natural.NewTestHelper("C", t), 2, 0}},
+		{"C#2", Note{natural.NewTestHelper("C", t), 2, 1}},
+		{"Db3", Note{natural.NewTestHelper("D", t), 3, -1}},
+		{"D3", Note{natural.NewTestHelper("D", t), 3, 0}},
+		{"D#3", Note{natural.NewTestHelper("D", t), 3, 1}},
+		{"Eb4", Note{natural.NewTestHelper("E", t), 4, -1}},
+		{"E4", Note{natural.NewTestHelper("E", t), 4, 0}},
+		{"E#4", Note{natural.NewTestHelper("E", t), 4, 1}},
+		{"Fb5", Note{natural.NewTestHelper("F", t), 5, -1}},
+		{"F5", Note{natural.NewTestHelper("F", t), 5, 0}},
+		{"F#5", Note{natural.NewTestHelper("F", t), 5, 1}},
+		{"Gb6", Note{natural.NewTestHelper("G", t), 6, -1}},
+		{"G6", Note{natural.NewTestHelper("G", t), 6, 0}},
+		{"G#6", Note{natural.NewTestHelper("G", t), 6, 1}},
+		{"Ab7", Note{natural.NewTestHelper("A", t), 7, -1}},
 	}
 	for _, test := range table {
 		actual, _ := New(test.in)
@@ -68,29 +68,29 @@ func TestNewFromParams(t *testing.T) {
 		accidental int
 		expected   Note
 	}{
-		{"A", 0, 0, Note{natural.NewNaturalTestHelper("A", t), 0, 0}},
-		{"B", 1, -1, Note{natural.NewNaturalTestHelper("B", t), 1, -1}},
-		{"B", 1, 0, Note{natural.NewNaturalTestHelper("B", t), 1, 0}},
-		{"B", 1, 1, Note{natural.NewNaturalTestHelper("B", t), 1, 1}},
-		{"C", 2, -1, Note{natural.NewNaturalTestHelper("C", t), 2, -1}},
-		{"C", 2, 0, Note{natural.NewNaturalTestHelper("C", t), 2, 0}},
-		{"C", 2, 1, Note{natural.NewNaturalTestHelper("C", t), 2, 1}},
-		{"D", 3, -1, Note{natural.NewNaturalTestHelper("D", t), 3, -1}},
-		{"D", 3, 0, Note{natural.NewNaturalTestHelper("D", t), 3, 0}},
-		{"D", 3, 1, Note{natural.NewNaturalTestHelper("D", t), 3, 1}},
-		{"E", 4, -1, Note{natural.NewNaturalTestHelper("E", t), 4, -1}},
-		{"E", 4, 0, Note{natural.NewNaturalTestHelper("E", t), 4, 0}},
-		{"E", 4, 1, Note{natural.NewNaturalTestHelper("E", t), 4, 1}},
-		{"F", 5, -1, Note{natural.NewNaturalTestHelper("F", t), 5, -1}},
-		{"F", 5, 0, Note{natural.NewNaturalTestHelper("F", t), 5, 0}},
-		{"F", 5, 1, Note{natural.NewNaturalTestHelper("F", t), 5, 1}},
-		{"G", 6, -1, Note{natural.NewNaturalTestHelper("G", t), 6, -1}},
-		{"G", 6, 0, Note{natural.NewNaturalTestHelper("G", t), 6, 0}},
-		{"G", 6, 1, Note{natural.NewNaturalTestHelper("G", t), 6, 1}},
-		{"A", 7, -1, Note{natural.NewNaturalTestHelper("A", t), 7, -1}},
+		{"A", 0, 0, Note{natural.NewTestHelper("A", t), 0, 0}},
+		{"B", 1, -1, Note{natural.NewTestHelper("B", t), 1, -1}},
+		{"B", 1, 0, Note{natural.NewTestHelper("B", t), 1, 0}},
+		{"B", 1, 1, Note{natural.NewTestHelper("B", t), 1, 1}},
+		{"C", 2, -1, Note{natural.NewTestHelper("C", t), 2, -1}},
+		{"C", 2, 0, Note{natural.NewTestHelper("C", t), 2, 0}},
+		{"C", 2, 1, Note{natural.NewTestHelper("C", t), 2, 1}},
+		{"D", 3, -1, Note{natural.NewTestHelper("D", t), 3, -1}},
+		{"D", 3, 0, Note{natural.NewTestHelper("D", t), 3, 0}},
+		{"D", 3, 1, Note{natural.NewTestHelper("D", t), 3, 1}},
+		{"E", 4, -1, Note{natural.NewTestHelper("E", t), 4, -1}},
+		{"E", 4, 0, Note{natural.NewTestHelper("E", t), 4, 0}},
+		{"E", 4, 1, Note{natural.NewTestHelper("E", t), 4, 1}},
+		{"F", 5, -1, Note{natural.NewTestHelper("F", t), 5, -1}},
+		{"F", 5, 0, Note{natural.NewTestHelper("F", t), 5, 0}},
+		{"F", 5, 1, Note{natural.NewTestHelper("F", t), 5, 1}},
+		{"G", 6, -1, Note{natural.NewTestHelper("G", t), 6, -1}},
+		{"G", 6, 0, Note{natural.NewTestHelper("G", t), 6, 0}},
+		{"G", 6, 1, Note{natural.NewTestHelper("G", t), 6, 1}},
+		{"A", 7, -1, Note{natural.NewTestHelper("A", t), 7, -1}},
 	}
 	for _, test := range table {
-		nat := natural.NewNaturalTestHelper(test.natural, t)
+		nat := natural.NewTestHelper(test.natural, t)
 		actual, _ := NewFromParams(nat, test.octave, test.accidental)
 		if actual != test.expected {
 			t.Logf(
@@ -116,7 +116,7 @@ func TestNewFromParams_FailsOnInvalidParams(t *testing.T) {
 		{"A", 3, 2},
 	}
 	for _, test := range table {
-		nat := natural.NewNaturalTestHelper(test.natural, t)
+		nat := natural.NewTestHelper(test.natural, t)
 		_, err := NewFromParams(nat, test.octave, test.accidental)
 		if err == nil {
 			t.Errorf(

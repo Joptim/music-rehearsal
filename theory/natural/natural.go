@@ -16,18 +16,18 @@ func (n Natural) GetName() string {
 	return n.name
 }
 
-func (n Natural) Next() (Natural, error) {
+func (n Natural) Next() Natural {
 	for pos, name := range naturalsNames {
 		if n.name == name {
 			nextPos := (pos + 1) % len(naturalsNames)
 			nextNaturalName := naturalsNames[nextPos]
-			return naturals[nextNaturalName], nil
+			return naturals[nextNaturalName]
 		}
 	}
-	return Natural{}, fmt.Errorf("cannot find next Natural from %v", n)
+	panic(fmt.Sprintf("cannot find next Natural from %v", n))
 }
 
-func (n Natural) Prev() (Natural, error) {
+func (n Natural) Prev() Natural {
 	// range naturalsNames in reverse order
 	for pos := len(naturalsNames) - 1; pos >= 0; pos-- {
 		name := naturalsNames[pos]
@@ -37,10 +37,10 @@ func (n Natural) Prev() (Natural, error) {
 				prevPos += len(naturalsNames)
 			}
 			prevNaturalName := naturalsNames[prevPos]
-			return naturals[prevNaturalName], nil
+			return naturals[prevNaturalName]
 		}
 	}
-	return Natural{}, fmt.Errorf("cannot find previous Natural from %v", n)
+	panic(fmt.Sprintf("cannot find previous Natural from %v", n))
 }
 
 // Semitones return the number of Semitones from A
@@ -48,7 +48,7 @@ func (n Natural) Semitones() int {
 	semitones := 0
 	current := naturalA
 	for current != n {
-		next, _ := current.Next()
+		next := current.Next()
 		if (next.name == "C" && current.name == "B") ||
 			(next.name == "F" && current.name == "E") {
 			semitones += 1
@@ -71,20 +71,18 @@ func (n Natural) SemitonesBasedOn(from Natural) int {
 }
 
 func (n Natural) SemitonesToNext() int {
-	next, _ := n.Next()
-	return next.SemitonesBasedOn(n)
+	return n.Next().SemitonesBasedOn(n)
 }
 
 func (n Natural) SemitonesFromPrev() int {
-	prev, _ := n.Prev()
-	return n.SemitonesBasedOn(prev)
+	return n.SemitonesBasedOn(n.Prev())
 }
 
 func (n Natural) IsA() bool {
 	return n.name == "A"
 }
 
-func NewNatural(name string) (Natural, error) {
+func New(name string) (Natural, error) {
 	if natural, exists := naturals[name]; exists {
 		return natural, nil
 	} else {
@@ -113,7 +111,7 @@ func init() {
 
 	// init naturalA
 	var err error
-	if naturalA, err = NewNatural("A"); err != nil {
+	if naturalA, err = New("A"); err != nil {
 		panic(err)
 	}
 }

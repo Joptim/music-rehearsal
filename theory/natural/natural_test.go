@@ -18,7 +18,7 @@ func TestNewNatural(t *testing.T) {
 		{"G", Natural{"G"}},
 	}
 	for _, test := range table {
-		actual, err := NewNatural(test.name)
+		actual, err := New(test.name)
 		if err != nil {
 			t.Errorf("with %s, got error %v, expected %v", test.name, err, test.expected)
 		}
@@ -32,7 +32,7 @@ func TestNewNatural(t *testing.T) {
 func TestNewNatural_FailsOnInvalidName(t *testing.T) {
 	table := []string{"A0", "Bb4", "C#", "H", "I"}
 	for _, name := range table {
-		_, err := NewNatural(name)
+		_, err := New(name)
 		if err == nil {
 			t.Errorf("with %s, got nil error, expected non-nil error", name)
 		}
@@ -53,11 +53,8 @@ func TestNatural_Next(t *testing.T) {
 		{"G", "A"},
 	}
 	for _, test := range table {
-		natural := NewNaturalTestHelper(test.natural, t)
-		actual, err := natural.Next()
-		if err != nil {
-			t.Errorf("with %s, got error %v, expected %s", test.natural, err, test.expected)
-		}
+		natural := NewTestHelper(test.natural, t)
+		actual := natural.Next()
 		if actual.GetName() != test.expected {
 			t.Errorf("with %s, got %s, expected %s", test.natural, actual.GetName(), test.expected)
 		}
@@ -78,11 +75,8 @@ func TestNatural_Prev(t *testing.T) {
 		{"G", "F"},
 	}
 	for _, test := range table {
-		natural := NewNaturalTestHelper(test.natural, t)
-		actual, err := natural.Prev()
-		if err != nil {
-			t.Errorf("with %s, got error %v, expected %s", test.natural, err, test.expected)
-		}
+		natural := NewTestHelper(test.natural, t)
+		actual := natural.Prev()
 		if actual.GetName() != test.expected {
 			t.Errorf("with %s, got %s, expected %s", test.natural, actual.GetName(), test.expected)
 		}
@@ -103,7 +97,7 @@ func TestNatural_Semitones(t *testing.T) {
 		{"G", 10},
 	}
 	for _, test := range table {
-		actual := NewNaturalTestHelper(test.name, t).Semitones()
+		actual := NewTestHelper(test.name, t).Semitones()
 		if test.expected != actual {
 			t.Errorf("with %s, got %v, expected %d", test.name, actual, test.expected)
 		}
@@ -125,8 +119,8 @@ func TestNatural_SemitonesBasedOn(t *testing.T) {
 		{"C", "B", 11},
 	}
 	for _, test := range table {
-		natural := NewNaturalTestHelper(test.natural, t)
-		base := NewNaturalTestHelper(test.base, t)
+		natural := NewTestHelper(test.natural, t)
+		base := NewTestHelper(test.base, t)
 		actual := natural.SemitonesBasedOn(base)
 		if actual != test.expected {
 			t.Errorf(
@@ -154,7 +148,7 @@ func TestNatural_SemitonesToNext(t *testing.T) {
 		{"G", 2},
 	}
 	for _, test := range table {
-		natural := NewNaturalTestHelper(test.name, t)
+		natural := NewTestHelper(test.name, t)
 		actual := natural.SemitonesToNext()
 		if actual != test.expected {
 			t.Errorf("with %s, got %d, expected %d", test.name, actual, test.expected)
@@ -176,7 +170,7 @@ func TestNatural_SemitonesFromPrev(t *testing.T) {
 		{"G", 2},
 	}
 	for _, test := range table {
-		natural := NewNaturalTestHelper(test.name, t)
+		natural := NewTestHelper(test.name, t)
 		actual := natural.SemitonesFromPrev()
 		if actual != test.expected {
 			t.Errorf("with %s, got %d, expected %d", test.name, actual, test.expected)
@@ -187,7 +181,7 @@ func TestNatural_SemitonesFromPrev(t *testing.T) {
 func TestNatural_GetName(t *testing.T) {
 	table := []string{"A", "B", "C", "D", "E", "F", "G"}
 	for _, expected := range table {
-		natural := NewNaturalTestHelper(expected, t)
+		natural := NewTestHelper(expected, t)
 		actual := natural.GetName()
 		if actual != expected {
 			t.Errorf("with %s, got %s, expected %s", expected, actual, expected)
@@ -209,7 +203,7 @@ func TestNatural_IsA(t *testing.T) {
 		{"G", false},
 	}
 	for _, test := range table {
-		natural := NewNaturalTestHelper(test.name, t)
+		natural := NewTestHelper(test.name, t)
 		actual := natural.IsA()
 		if actual != test.expected {
 			t.Errorf("with %s, got %t, expected %t", test.name, actual, test.expected)
@@ -220,13 +214,13 @@ func TestNatural_IsA(t *testing.T) {
 func TestAllNaturals(t *testing.T) {
 	actual := AllNaturals()
 	expected := []Natural{
-		NewNaturalTestHelper("A", t),
-		NewNaturalTestHelper("B", t),
-		NewNaturalTestHelper("C", t),
-		NewNaturalTestHelper("D", t),
-		NewNaturalTestHelper("E", t),
-		NewNaturalTestHelper("F", t),
-		NewNaturalTestHelper("G", t),
+		NewTestHelper("A", t),
+		NewTestHelper("B", t),
+		NewTestHelper("C", t),
+		NewTestHelper("D", t),
+		NewTestHelper("E", t),
+		NewTestHelper("F", t),
+		NewTestHelper("G", t),
 	}
 	if !testAreEqual(actual, expected, t) {
 		t.Errorf("got %v, expected %v", actual, expected)

@@ -2,8 +2,8 @@ package natural
 
 import "testing"
 
-func NewNaturalTestHelper(name string, t *testing.T) Natural {
-	natural, err := NewNatural(name)
+func NewTestHelper(name string, t *testing.T) Natural {
+	natural, err := New(name)
 	if err != nil {
 		t.Fatalf("cannot instantiate natural with name %s. Got error %v", name, err)
 	}
