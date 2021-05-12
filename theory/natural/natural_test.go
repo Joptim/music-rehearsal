@@ -55,8 +55,8 @@ func TestNatural_Next(t *testing.T) {
 	for _, test := range table {
 		natural := NewTestHelper(test.natural, t)
 		actual := natural.Next()
-		if actual.GetName() != test.expected {
-			t.Errorf("with %s, got %s, expected %s", test.natural, actual.GetName(), test.expected)
+		if actual.Name() != test.expected {
+			t.Errorf("with %s, got %s, expected %s", test.natural, actual.Name(), test.expected)
 		}
 	}
 }
@@ -77,8 +77,8 @@ func TestNatural_Prev(t *testing.T) {
 	for _, test := range table {
 		natural := NewTestHelper(test.natural, t)
 		actual := natural.Prev()
-		if actual.GetName() != test.expected {
-			t.Errorf("with %s, got %s, expected %s", test.natural, actual.GetName(), test.expected)
+		if actual.Name() != test.expected {
+			t.Errorf("with %s, got %s, expected %s", test.natural, actual.Name(), test.expected)
 		}
 	}
 }
@@ -182,7 +182,7 @@ func TestNatural_GetName(t *testing.T) {
 	table := []string{"A", "B", "C", "D", "E", "F", "G"}
 	for _, expected := range table {
 		natural := NewTestHelper(expected, t)
-		actual := natural.GetName()
+		actual := natural.Name()
 		if actual != expected {
 			t.Errorf("with %s, got %s, expected %s", expected, actual, expected)
 		}
@@ -214,12 +214,12 @@ func TestNatural_AddIntervalSize(t *testing.T) {
 	for _, test := range table {
 		natural := NewTestHelper(test.natural, t)
 		actual := natural.AddIntervalSize(test.size)
-		if actual.GetName() != test.expected {
+		if actual.Name() != test.expected {
 			t.Logf(
 				"with %s an %d, got %s, expected %s",
 				test.natural,
 				test.size,
-				actual.GetName(),
+				actual.Name(),
 				test.expected,
 			)
 		}

@@ -12,7 +12,7 @@ type Natural struct {
 	name string
 }
 
-func (n Natural) GetName() string {
+func (n Natural) Name() string {
 	return n.name
 }
 
@@ -78,18 +78,18 @@ func (n Natural) SemitonesFromPrev() int {
 	return n.SemitonesBasedOn(n.Prev())
 }
 
-func (n Natural) AddIntervalSize(distance int) Natural {
+func (n Natural) AddIntervalSize(size int) Natural {
 	// Find natural position
 	for pos, name := range naturalsNames {
 		if name == n.name {
-			pos = (pos + distance) % len(naturalsNames)
+			pos = (pos + size) % len(naturalsNames)
 			if pos < 0 {
 				pos += len(naturalsNames)
 			}
 			return naturals[naturalsNames[pos]]
 		}
 	}
-	panic(fmt.Sprintf("cannot add interval size distance %d to natural %v", distance, n))
+	panic(fmt.Sprintf("cannot add interval size size %d to natural %v", size, n))
 }
 
 func (n Natural) IsA() bool {

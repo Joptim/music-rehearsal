@@ -26,7 +26,7 @@ func (n Note) GetName() string {
 	case 1:
 		accidental = "#"
 	}
-	return fmt.Sprintf("%s%s%d", n.natural.GetName(), accidental, n.octave)
+	return fmt.Sprintf("%s%s%d", n.natural.Name(), accidental, n.octave)
 }
 
 func (n Note) SemitonesFrom(from Note) int {
