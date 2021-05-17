@@ -10,6 +10,7 @@ func TestNew(t *testing.T) {
 		in       string
 		expected Note
 	}{
+		{"Cb-3", Note{natural.NewTestHelper("C", t), -3, -1}},
 		{"A0", Note{natural.NewTestHelper("A", t), 0, 0}},
 		{"Bb1", Note{natural.NewTestHelper("B", t), 1, -1}},
 		{"B1", Note{natural.NewTestHelper("B", t), 1, 0}},
@@ -30,6 +31,7 @@ func TestNew(t *testing.T) {
 		{"G6", Note{natural.NewTestHelper("G", t), 6, 0}},
 		{"G#6", Note{natural.NewTestHelper("G", t), 6, 1}},
 		{"Ab7", Note{natural.NewTestHelper("A", t), 7, -1}},
+		{"G#15", Note{natural.NewTestHelper("G", t), 15, 1}},
 	}
 	for _, test := range table {
 		actual, _ := New(test.in)
@@ -42,7 +44,6 @@ func TestNew(t *testing.T) {
 func TestNew_FailsOnInvalidName(t *testing.T) {
 	table := []string{
 		"A",
-		"A-1",
 		"A3b",
 		"A#b3",
 		"Abb3",
@@ -111,7 +112,6 @@ func TestNewFromParams_FailsOnInvalidParams(t *testing.T) {
 		octave     int
 		accidental int
 	}{
-		{"A", -1, 0},
 		{"A", 3, -2},
 		{"A", 3, 2},
 	}
@@ -151,6 +151,8 @@ func TestNote_GetName(t *testing.T) {
 		"G6",
 		"G#6",
 		"Ab7",
+		"G#-7",
+		"F15",
 	}
 	for _, name := range table {
 		note := NewHelper(name, t)
@@ -186,6 +188,25 @@ func TestNote_Semitones(t *testing.T) {
 		{"G6", 82},
 		{"G#6", 83},
 		{"Ab7", 83},
+		{"B#-1", -9},
+		{"B-1", -10},
+		{"Bb-1", -11},
+		{"C#-2", -20},
+		{"C-2", -21},
+		{"Cb-2", -22},
+		{"D#-3", -30},
+		{"D-3", -31},
+		{"Db-3", -32},
+		{"E#-4", -40},
+		{"E-4", -41},
+		{"Eb-4", -42},
+		{"F#-5", -51},
+		{"F-5", -52},
+		{"Fb-5", -53},
+		{"G#-6", -61},
+		{"G-6", -62},
+		{"Gb-6", -63},
+		{"A-6", -72},
 	}
 	for _, test := range table {
 		note := NewHelper(test.name, t)
@@ -220,6 +241,7 @@ func TestNote_SemitonesFrom(t *testing.T) {
 		{"C3", "Bb4", 10},
 		{"C3", "B4", 11},
 		{"C3", "C4", 12},
+		{"A-1", "C2", 39},
 		{"C3", "B3", -1},
 		{"C3", "Bb3", -2},
 		{"C3", "A#3", -2},
@@ -237,6 +259,7 @@ func TestNote_SemitonesFrom(t *testing.T) {
 		{"C3", "Db2", -11},
 		{"C3", "C#2", -11},
 		{"C3", "C2", -12},
+		{"C2", "A-1", -39},
 	}
 
 	for _, test := range table {
@@ -254,27 +277,34 @@ func TestNote_AddSemitone(t *testing.T) {
 		note     Note
 		expected Note
 	}{
+		{NewHelper("Cb3", t), NewHelper("C3", t)},
 		{NewHelper("C3", t), NewHelper("C#3", t)},
 		{NewHelper("C#3", t), NewHelper("D3", t)},
+		{NewHelper("Db3", t), NewHelper("D3", t)},
 		{NewHelper("D3", t), NewHelper("D#3", t)},
 		{NewHelper("D#3", t), NewHelper("E3", t)},
-		{NewHelper("E3", t), NewHelper("F3", t)},
+		{NewHelper("Eb3", t), NewHelper("E3", t)},
+		{NewHelper("E3", t), NewHelper("E#3", t)},
+		{NewHelper("E#3", t), NewHelper("F#3", t)},
+		{NewHelper("Fb3", t), NewHelper("F3", t)},
 		{NewHelper("F3", t), NewHelper("F#3", t)},
 		{NewHelper("F#3", t), NewHelper("G3", t)},
+		{NewHelper("Gb3", t), NewHelper("G3", t)},
 		{NewHelper("G3", t), NewHelper("G#3", t)},
 		{NewHelper("G#3", t), NewHelper("A4", t)},
+		{NewHelper("Ab3", t), NewHelper("A3", t)},
 		{NewHelper("A4", t), NewHelper("A#4", t)},
 		{NewHelper("A#4", t), NewHelper("B4", t)},
-		{NewHelper("Ab3", t), NewHelper("A3", t)},
-		{NewHelper("Bb3", t), NewHelper("B3", t)},
-		{NewHelper("Cb3", t), NewHelper("C3", t)},
-		{NewHelper("Db3", t), NewHelper("D3", t)},
-		{NewHelper("Eb3", t), NewHelper("E3", t)},
-		{NewHelper("Fb3", t), NewHelper("F3", t)},
-		{NewHelper("Gb3", t), NewHelper("G3", t)},
+		{NewHelper("Bb4", t), NewHelper("B4", t)},
+		{NewHelper("B4", t), NewHelper("B#4", t)},
+		{NewHelper("B#4", t), NewHelper("C#4", t)},
+		{NewHelper("G#-1", t), NewHelper("A0", t)},
+		{NewHelper("C-3", t), NewHelper("C#-3", t)},
+		{NewHelper("Gb-3", t), NewHelper("G-3", t)},
+		{NewHelper("G#-3", t), NewHelper("A-2", t)},
 	}
 	for _, test := range table {
-		actual, _ := test.note.addSemitone()
+		actual := test.note.addSemitone()
 		if test.expected != actual {
 			t.Errorf(
 				"from %v, got %v, expected %v",
@@ -291,28 +321,34 @@ func TestNote_SubtractSemitone(t *testing.T) {
 		note     Note
 		expected Note
 	}{
-		{NewHelper("C3", t), NewHelper("B3", t)},
+		{NewHelper("C#3", t), NewHelper("C3", t)},
+		{NewHelper("C3", t), NewHelper("Cb3", t)},
+		{NewHelper("Cb3", t), NewHelper("Bb3", t)},
+		{NewHelper("B#3", t), NewHelper("B3", t)},
 		{NewHelper("B3", t), NewHelper("Bb3", t)},
 		{NewHelper("Bb3", t), NewHelper("A3", t)},
+		{NewHelper("A#3", t), NewHelper("A3", t)},
 		{NewHelper("A3", t), NewHelper("Ab3", t)},
 		{NewHelper("Ab3", t), NewHelper("G2", t)},
+		{NewHelper("G#3", t), NewHelper("G3", t)},
 		{NewHelper("G2", t), NewHelper("Gb2", t)},
 		{NewHelper("Gb2", t), NewHelper("F2", t)},
-		{NewHelper("F2", t), NewHelper("E2", t)},
+		{NewHelper("F#2", t), NewHelper("F2", t)},
+		{NewHelper("F2", t), NewHelper("Fb2", t)},
+		{NewHelper("Fb2", t), NewHelper("Eb2", t)},
+		{NewHelper("E#3", t), NewHelper("E3", t)},
 		{NewHelper("E2", t), NewHelper("Eb2", t)},
 		{NewHelper("Eb2", t), NewHelper("D2", t)},
+		{NewHelper("D#3", t), NewHelper("D3", t)},
 		{NewHelper("D2", t), NewHelper("Db2", t)},
 		{NewHelper("Db2", t), NewHelper("C2", t)},
-		{NewHelper("A#3", t), NewHelper("A3", t)},
-		{NewHelper("B#3", t), NewHelper("B3", t)},
-		{NewHelper("C#3", t), NewHelper("C3", t)},
-		{NewHelper("D#3", t), NewHelper("D3", t)},
-		{NewHelper("E#3", t), NewHelper("E3", t)},
-		{NewHelper("F#3", t), NewHelper("F3", t)},
-		{NewHelper("G#3", t), NewHelper("G3", t)},
+		{NewHelper("Ab0", t), NewHelper("G-1", t)},
+		{NewHelper("C-3", t), NewHelper("Cb-3", t)},
+		{NewHelper("G#-3", t), NewHelper("G-3", t)},
+		{NewHelper("Ab-3", t), NewHelper("G-4", t)},
 	}
 	for _, test := range table {
-		actual, _ := test.note.SubtractSemitone()
+		actual := test.note.subtractSemitone()
 		if test.expected != actual {
 			t.Errorf(
 				"from %v, got %v, expected %v",
@@ -321,13 +357,6 @@ func TestNote_SubtractSemitone(t *testing.T) {
 				test.expected,
 			)
 		}
-	}
-}
-
-func TestNote_SubtractSemitone_FailsIfOutOfRange(t *testing.T) {
-	Ab0 := NewHelper("Ab0", t)
-	if _, err := Ab0.SubtractSemitone(); err == nil {
-		t.Errorf("with %v, got error %v, expected non-nil error", Ab0.GetName(), err)
 	}
 }
 
@@ -342,29 +371,35 @@ func TestNote_AddSemitones(t *testing.T) {
 		{NewHelper("C3", t), 2, NewHelper("D3", t)},
 		{NewHelper("C3", t), 3, NewHelper("D#3", t)},
 		{NewHelper("C3", t), 4, NewHelper("E3", t)},
-		{NewHelper("C3", t), 5, NewHelper("F3", t)},
+		{NewHelper("C3", t), 5, NewHelper("E#3", t)},
 		{NewHelper("C3", t), 6, NewHelper("F#3", t)},
 		{NewHelper("C3", t), 7, NewHelper("G3", t)},
 		{NewHelper("C3", t), 8, NewHelper("G#3", t)},
 		{NewHelper("C3", t), 9, NewHelper("A4", t)},
 		{NewHelper("C3", t), 10, NewHelper("A#4", t)},
 		{NewHelper("C3", t), 11, NewHelper("B4", t)},
-		{NewHelper("C3", t), 12, NewHelper("C4", t)},
-		{NewHelper("C3", t), -1, NewHelper("B3", t)},
+		{NewHelper("C3", t), 12, NewHelper("B#4", t)},
+		{NewHelper("C3", t), 13, NewHelper("C#4", t)},
+		{NewHelper("F-1", t), 7, NewHelper("B#0", t)},
+		{NewHelper("Gb-2", t), 12, NewHelper("F#-1", t)},
+		{NewHelper("C3", t), -1, NewHelper("Cb3", t)},
 		{NewHelper("C3", t), -2, NewHelper("Bb3", t)},
 		{NewHelper("C3", t), -3, NewHelper("A3", t)},
 		{NewHelper("C3", t), -4, NewHelper("Ab3", t)},
 		{NewHelper("C3", t), -5, NewHelper("G2", t)},
 		{NewHelper("C3", t), -6, NewHelper("Gb2", t)},
 		{NewHelper("C3", t), -7, NewHelper("F2", t)},
-		{NewHelper("C3", t), -8, NewHelper("E2", t)},
+		{NewHelper("C3", t), -8, NewHelper("Fb2", t)},
 		{NewHelper("C3", t), -9, NewHelper("Eb2", t)},
 		{NewHelper("C3", t), -10, NewHelper("D2", t)},
 		{NewHelper("C3", t), -11, NewHelper("Db2", t)},
 		{NewHelper("C3", t), -12, NewHelper("C2", t)},
+		{NewHelper("C3", t), -13, NewHelper("Cb2", t)},
+		{NewHelper("C0", t), -7, NewHelper("F-1", t)},
+		{NewHelper("F-1", t), -11, NewHelper("Gb-2", t)},
 	}
 	for _, test := range table {
-		actual, _ := test.note.AddSemitones(test.semitones)
+		actual := test.note.AddSemitones(test.semitones)
 		if test.expected != actual {
 			t.Errorf(
 				"from %v and %d, got %v, expected %v",

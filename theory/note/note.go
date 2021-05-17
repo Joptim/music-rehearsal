@@ -39,76 +39,69 @@ func (n Note) semitones() int {
 	return 12*n.octave + semitones + n.accidental
 }
 
-func (n Note) addSemitone() (Note, error) {
-	nat := n.natural
-	octave := n.octave
-	accidental := n.accidental
-	switch accidental {
-	case 0:
-		if nat.SemitonesToNext() == 2 {
-			accidental = 1
-			break
-		}
-		fallthrough
-	case 1:
-		nat = n.natural.Next()
-		if nat.IsA() {
-			octave += 1
-		}
-		fallthrough
-	case -1:
-		accidental = 0
-	}
-	return NewFromParams(nat, octave, accidental)
-}
-
-func (n Note) SubtractSemitone() (Note, error) {
-	nat := n.natural
-	octave := n.octave
-	accidental := n.accidental
-	switch accidental {
-	case 0:
-		if nat.SemitonesFromPrev() == 2 {
-			accidental = -1
-			break
-		}
-		fallthrough
-	case -1:
-		if nat.IsA() {
-			octave -= 1
-		}
-		nat = n.natural.Prev()
-		fallthrough
-	case 1:
-		accidental = 0
-	}
-	return NewFromParams(nat, octave, accidental)
-}
-
-func (n Note) AddSemitones(semitones int) (Note, error) {
-	note := n
+func (n Note) addSemitone() Note {
+	var note Note
 	var err error
+	if n.accidental == 1 {
+		nextNatural := n.natural.Next()
+		if n.natural.IsB() || n.natural.IsE() {
+			note, err = NewFromParams(nextNatural, n.octave, 1)
+		} else if n.natural.IsG() {
+			note, err = NewFromParams(nextNatural, n.octave+1, 0)
+		} else {
+			note, err = NewFromParams(nextNatural, n.octave, 0)
+		}
+	} else {
+		note, err = NewFromParams(n.natural, n.octave, n.accidental+1)
+	}
+	if err != nil {
+		panic(fmt.Sprintf("cannot add semitone to note %v", n))
+	}
+	return note
+}
+
+func (n Note) subtractSemitone() Note {
+	var note Note
+	var err error
+	if n.accidental == -1 {
+		prevNatural := n.natural.Prev()
+		if n.natural.IsC() || n.natural.IsF() {
+			note, err = NewFromParams(prevNatural, n.octave, -1)
+		} else if n.natural.IsA() {
+			note, err = NewFromParams(prevNatural, n.octave-1, 0)
+		} else {
+			note, err = NewFromParams(prevNatural, n.octave, 0)
+		}
+	} else {
+		note, err = NewFromParams(n.natural, n.octave, n.accidental-1)
+	}
+	if err != nil {
+		panic(fmt.Sprintf("cannot subtract semitone to note %v", n))
+	}
+	return note
+}
+
+func (n Note) AddSemitones(semitones int) Note {
+	note := n
 	if semitones >= 0 {
 		for st := 1; st <= semitones; st++ {
-			if note, err = note.addSemitone(); err != nil {
-				break
-			}
+			note = note.addSemitone()
 		}
 	} else {
 		for st := -1; st >= semitones; st-- {
-			if note, err = note.SubtractSemitone(); err != nil {
-				break
-			}
+			note = note.subtractSemitone()
 		}
 	}
-	return note, err
+	return note
+}
+
 }
 
 func New(name string) (Note, error) {
 	re := regexp.MustCompile(
 		"^(?P<natural>[A-G]{1})" +
 			"(?P<accidental>b|#)?" +
-			"(?P<octave>[0-7]{1})$")
+			"(?P<sign>-?)(?P<octave>[0-9]+)$")
 	match := re.FindStringSubmatch(name)
 	if len(match) == 0 {
 		return Note{}, fmt.Errorf("cannot create note with name %s", name)
@@ -129,21 +122,22 @@ func New(name string) (Note, error) {
 		accidental = -1
 	}
 
+	// Sign
+	sign := 1
+	if match[3] == "-" {
+		sign = -1
+	}
 	// Octave
-	octave, err := strconv.Atoi(match[3])
+	octave, err := strconv.Atoi(match[4])
 	if err != nil {
 		return Note{}, err
 	}
 
-	return Note{
-		natural:    nat,
-		octave:     octave,
-		accidental: accidental,
-	}, nil
+	return NewFromParams(nat, sign*octave, accidental)
 }
 
 func NewFromParams(n natural.Natural, octave, accidental int) (Note, error) {
-	if octave < 0 || accidental < -1 || accidental > 1 {
+	if accidental < -1 || accidental > 1 {
 		return Note{}, fmt.Errorf(
 			"cannot create note with natural %v, octave %d and accidental %d",
 			n,
