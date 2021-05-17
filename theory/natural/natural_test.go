@@ -195,27 +195,28 @@ func TestNatural_AddIntervalSize(t *testing.T) {
 		size     int
 		expected string
 	}{
-		{"C", 0, "C"},
-		{"C", 1, "D"},
-		{"C", 2, "E"},
-		{"C", 3, "F"},
-		{"C", 4, "G"},
-		{"C", 5, "A"},
-		{"C", 6, "B"},
-		{"C", 7, "C"},
-		{"C", -1, "B"},
-		{"C", -2, "A"},
-		{"C", -3, "G"},
-		{"C", -4, "F"},
-		{"C", -5, "E"},
-		{"C", -6, "D"},
-		{"C", -7, "C"},
+		{"C", 1, "C"},
+		{"C", 2, "D"},
+		{"C", 3, "E"},
+		{"C", 4, "F"},
+		{"C", 5, "G"},
+		{"C", 6, "A"},
+		{"C", 7, "B"},
+		{"C", 8, "C"},
+		{"C", -1, "C"},
+		{"C", -2, "B"},
+		{"C", -3, "A"},
+		{"C", -4, "G"},
+		{"C", -5, "F"},
+		{"C", -6, "E"},
+		{"C", -7, "D"},
+		{"C", -8, "C"},
 	}
 	for _, test := range table {
 		natural := NewTestHelper(test.natural, t)
-		actual := natural.AddIntervalSize(test.size)
+		actual, _ := natural.AddIntervalSize(test.size)
 		if actual.Name() != test.expected {
-			t.Logf(
+			t.Errorf(
 				"with %s an %d, got %s, expected %s",
 				test.natural,
 				test.size,
@@ -223,6 +224,13 @@ func TestNatural_AddIntervalSize(t *testing.T) {
 				test.expected,
 			)
 		}
+	}
+}
+
+func TestNatural_AddIntervalSize_FailsIfSizeIsInvalid(t *testing.T) {
+	natural := NewTestHelper("C", t)
+	if _, err := natural.AddIntervalSize(0); err == nil {
+		t.Errorf("with C and 0, expected non-nil error, got nil error")
 	}
 }
 

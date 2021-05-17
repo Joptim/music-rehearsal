@@ -78,7 +78,14 @@ func (n Natural) SemitonesFromPrev() int {
 	return n.SemitonesBasedOn(n.Prev())
 }
 
-func (n Natural) AddIntervalSize(size int) Natural {
+func (n Natural) AddIntervalSize(size int) (Natural, error) {
+	if size == 0 {
+		return Natural{}, fmt.Errorf("cannot add interval size %d to natural %v", size, n)
+	} else if size > 0 {
+		size -= 1
+	} else {
+		size += 1
+	}
 	// Find natural position
 	for pos, name := range naturalsNames {
 		if name == n.name {
@@ -86,10 +93,10 @@ func (n Natural) AddIntervalSize(size int) Natural {
 			if pos < 0 {
 				pos += len(naturalsNames)
 			}
-			return naturals[naturalsNames[pos]]
+			return naturals[naturalsNames[pos]], nil
 		}
 	}
-	panic(fmt.Sprintf("cannot add interval size size %d to natural %v", size, n))
+	panic(fmt.Sprintf("cannot add interval size %d to natural %v", size, n))
 }
 
 func (n Natural) IsA() bool {
