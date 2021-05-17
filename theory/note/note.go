@@ -2,6 +2,7 @@ package note
 
 import (
 	"fmt"
+	"github.com/Joptim/music-rehearsal/theory/interval"
 	"github.com/Joptim/music-rehearsal/theory/natural"
 	"regexp"
 	"strconv"
@@ -95,6 +96,30 @@ func (n Note) AddSemitones(semitones int) Note {
 	return note
 }
 
+func (n Note) AddInterval(in interval.Interval) (Note, error) {
+	note := n.AddSemitones(in.Semitones())
+
+	// Check naturals match
+	expectedNatural, _ := n.natural.AddIntervalSize(in.Size())
+	if note.natural.Name() == expectedNatural.Name() {
+		return note, nil
+	}
+	// Check if equivalent note matches
+	note = note.GetEquivalent()
+	if note.natural.Name() == expectedNatural.Name() {
+		return note, nil
+	}
+	return Note{}, fmt.Errorf("cannot add interval %v to note %v", in, n)
+}
+
+func (n Note) GetEquivalent() Note {
+	if (n.natural.IsF() || n.natural.IsC()) && n.accidental == 0 {
+		return n.AddSemitones(-2).AddSemitones(2)
+	}
+	if (n.natural.IsE() || n.natural.IsB()) && n.accidental == 0 {
+		return n.AddSemitones(2).AddSemitones(-2)
+	}
+	return n.AddSemitones(2 * n.accidental).AddSemitones(-2 * n.accidental)
 }
 
 func New(name string) (Note, error) {

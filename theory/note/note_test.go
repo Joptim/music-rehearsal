@@ -1,6 +1,7 @@
 package note
 
 import (
+	"github.com/Joptim/music-rehearsal/theory/interval"
 	"github.com/Joptim/music-rehearsal/theory/natural"
 	"testing"
 )
@@ -412,11 +413,105 @@ func TestNote_AddSemitones(t *testing.T) {
 	}
 }
 
-func TestNote_AddSemitones_FailsIfOutOfRange(t *testing.T) {
-	A0 := NewHelper("A0", t)
-	if _, err := A0.AddSemitones(-5); err == nil {
-		t.Errorf("with %v, got error %v, expected non-nil error", A0.GetName(), err)
+func TestNote_GetEquivalent(t *testing.T) {
+	table := []struct {
+		note     string
+		expected string
+	}{
+		{"F3", "E#3"},
+		{"E#3", "F3"},
+		{"E3", "Fb3"},
+		{"Fb3", "E3"},
+		{"C3", "B#3"},
+		{"B#3", "C3"},
+		{"B3", "Cb3"},
+		{"Cb3", "B3"},
+		{"D#3", "Eb3"},
+		{"Eb3", "D#3"},
+		{"G#3", "Ab4"},
+		{"Ab4", "G#3"},
+		{"G3", "G3"},
+		{"F-3", "E#-3"},
+		{"Cb-3", "B-3"},
 	}
+	for _, test := range table {
+		note := NewHelper(test.note, t)
+		expected := NewHelper(test.expected, t)
+		actual := note.GetEquivalent()
+		if actual != expected {
+			t.Errorf("with %s, got %v, expected %v", test.note, actual, expected)
+		}
+	}
+}
+
+func TestNote_AddInterval(t *testing.T) {
+	table := []struct {
+		note     string
+		code     string
+		expected string
+	}{
+		{"C3", "P1", "C3"},
+		{"C3", "m2", "Db3"},
+		{"C3", "A1", "C#3"},
+		{"C3", "M2", "D3"},
+		{"C3", "m3", "Eb3"},
+		{"C3", "A2", "D#3"},
+		{"C3", "M3", "E3"},
+		{"C3", "d4", "Fb3"},
+		{"C3", "P4", "F3"},
+		{"C3", "A3", "E#3"},
+		{"C3", "d5", "Gb3"},
+		{"C3", "A4", "F#3"},
+		{"C3", "P5", "G3"},
+		{"C3", "m6", "Ab4"},
+		{"C3", "A5", "G#3"},
+		{"C3", "M6", "A4"},
+		{"C3", "m7", "Bb4"},
+		{"C3", "A6", "A#4"},
+		{"C3", "M7", "B4"},
+		{"C3", "d8", "Cb4"},
+		{"C3", "P8", "C4"},
+		{"C3", "A7", "B#4"},
+	}
+	for _, test := range table {
+		note := NewHelper(test.note, t)
+		expected := NewHelper(test.expected, t)
+		in := interval.NewTestHelper(test.code, t)
+		actual, _ := note.AddInterval(in)
+		if actual != expected {
+			t.Errorf(
+				"with %s and %s, got %v, expected %v",
+				test.note,
+				test.code,
+				actual,
+				expected,
+			)
+		}
+	}
+}
+
+func TestNote_AddInterval_FailsIfIntervalIsInfeasible(t *testing.T) {
+	table := []struct {
+		note string
+		code string
+	}{
+		{"C3", "d2"},
+		{"C3", "d3"},
+		{"C3", "d6"},
+		{"C3", "d7"},
+	}
+	for _, test := range table {
+		note := NewHelper(test.note, t)
+		in := interval.NewTestHelper(test.code, t)
+		if _, err := note.AddInterval(in); err == nil {
+			t.Errorf(
+				"with %s and %s, got nil error, expected non-nil error",
+				test.note,
+				test.code,
+			)
+		}
+	}
+
 }
 
 func NewHelper(name string, t *testing.T) Note {

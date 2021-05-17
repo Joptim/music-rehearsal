@@ -235,24 +235,52 @@ func TestNatural_AddIntervalSize_FailsIfSizeIsInvalid(t *testing.T) {
 }
 
 func TestNatural_IsA(t *testing.T) {
-	table := []struct {
-		name     string
-		expected bool
-	}{
-		{"A", true},
-		{"B", false},
-		{"C", false},
-		{"D", false},
-		{"E", false},
-		{"F", false},
-		{"G", false},
+	A, B := NewTestHelper("A", t), NewTestHelper("B", t)
+	if !A.IsA() {
+		t.Errorf("with %s, got false, expected true", A.name)
 	}
-	for _, test := range table {
-		natural := NewTestHelper(test.name, t)
-		actual := natural.IsA()
-		if actual != test.expected {
-			t.Errorf("with %s, got %t, expected %t", test.name, actual, test.expected)
-		}
+	if B.IsA() {
+		t.Errorf("with %s, got true, expected false", B.name)
+	}
+}
+
+func TestNatural_IsB(t *testing.T) {
+	B, C := NewTestHelper("B", t), NewTestHelper("C", t)
+	if !B.IsB() {
+		t.Errorf("with %s, got false, expected true", B.name)
+	}
+	if C.IsB() {
+		t.Errorf("with %s, got true, expected false", C.name)
+	}
+}
+
+func TestNatural_IsC(t *testing.T) {
+	C, D := NewTestHelper("C", t), NewTestHelper("D", t)
+	if !C.IsC() {
+		t.Errorf("with %s, got false, expected true", C.name)
+	}
+	if D.IsC() {
+		t.Errorf("with %s, got true, expected false", D.name)
+	}
+}
+
+func TestNatural_IsD(t *testing.T) {
+	D, E := NewTestHelper("D", t), NewTestHelper("E", t)
+	if !D.IsD() {
+		t.Errorf("with %s, got false, expected true", D.name)
+	}
+	if E.IsD() {
+		t.Errorf("with %s, got true, expected false", E.name)
+	}
+}
+
+func TestNatural_IsE(t *testing.T) {
+	E, A := NewTestHelper("E", t), NewTestHelper("A", t)
+	if !E.IsE() {
+		t.Errorf("with %s, got false, expected true", E.name)
+	}
+	if A.IsE() {
+		t.Errorf("with %s, got true, expected false", A.name)
 	}
 }
 

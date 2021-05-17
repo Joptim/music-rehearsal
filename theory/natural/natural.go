@@ -103,6 +103,30 @@ func (n Natural) IsA() bool {
 	return n.name == "A"
 }
 
+func (n Natural) IsB() bool {
+	return n.name == "B"
+}
+
+func (n Natural) IsC() bool {
+	return n.name == "C"
+}
+
+func (n Natural) IsD() bool {
+	return n.name == "D"
+}
+
+func (n Natural) IsE() bool {
+	return n.name == "E"
+}
+
+func (n Natural) IsF() bool {
+	return n.name == "F"
+}
+
+func (n Natural) IsG() bool {
+	return n.name == "G"
+}
+
 func New(name string) (Natural, error) {
 	if natural, exists := naturals[name]; exists {
 		return natural, nil
