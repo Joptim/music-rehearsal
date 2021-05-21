@@ -1,25 +1,21 @@
-package main
+package mediaplayer
 
 import (
 	"fmt"
+	"github.com/Joptim/music-rehearsal/media"
+	n "github.com/Joptim/music-rehearsal/theory/note"
 	"github.com/faiface/beep"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
 	"time"
 )
 
-type Player interface {
-	Prepare(notes ...string) error
-	Play(delay time.Duration, note ...string) (<-chan struct{}, error)
-	Release(notes ...string) error
-}
-
-type MediaPlayer struct {
-	buffers       map[string]*beep.Buffer
+type beepFacade struct {
+	buffers       map[n.Note]*beep.Buffer
 	isInitialised bool
 }
 
-func (mp *MediaPlayer) init(sampleRate beep.SampleRate, bufferSize int) error {
+func (mp *beepFacade) init(sampleRate beep.SampleRate, bufferSize int) error {
 	if mp.isInitialised {
 		return nil
 	}
@@ -30,12 +26,14 @@ func (mp *MediaPlayer) init(sampleRate beep.SampleRate, bufferSize int) error {
 	return nil
 }
 
-func (mp *MediaPlayer) Prepare(notes ...string) error {
+// Prepare loads note sounds from media folder into a buffer.
+// Calling this method with a note whose sound is already loaded takes no action.
+func (mp *beepFacade) Prepare(notes ...n.Note) error {
 	for _, note := range notes {
-		if _, ok := mp.buffers[note]; ok {
+		if _, exists := mp.buffers[note]; exists {
 			continue
 		}
-		file, err := LoadNote(note)
+		file, err := media.GetReadCloser(note)
 		if err != nil {
 			return err
 		}
@@ -60,11 +58,11 @@ func (mp *MediaPlayer) Prepare(notes ...string) error {
 	return nil
 }
 
-//Play plays the given notes with the given delay between them
-func (mp *MediaPlayer) Play(delay time.Duration, notes ...string) (<-chan struct{}, error) {
+// Play plays the given notes with the given delay between them
+func (mp *beepFacade) Play(delay time.Duration, notes ...n.Note) (<-chan struct{}, error) {
 	for _, note := range notes {
 		if _, ok := mp.buffers[note]; !ok {
-			return nil, fmt.Errorf("note %s not prepared", note)
+			return nil, fmt.Errorf("note %s not prepared", note.GetName())
 		}
 	}
 
@@ -73,7 +71,7 @@ func (mp *MediaPlayer) Play(delay time.Duration, notes ...string) (<-chan struct
 	return done, nil
 }
 
-func (mp *MediaPlayer) play(done chan<- struct{}, delay time.Duration, notes ...string) {
+func (mp *beepFacade) play(done chan<- struct{}, delay time.Duration, notes ...n.Note) {
 	signal := make(chan struct{})
 	for i, note := range notes {
 		buffer := mp.buffers[note]
@@ -92,16 +90,24 @@ func (mp *MediaPlayer) play(done chan<- struct{}, delay time.Duration, notes ...
 	close(done)
 }
 
-func (mp *MediaPlayer) Release(notes ...string) error {
+// Release frees note sounds memory from buffer.
+// Calling this method with a note whose sound is already released takes no action.
+func (mp *beepFacade) Release(notes ...n.Note) {
 	for _, note := range notes {
 		delete(mp.buffers, note)
 	}
-	return nil
 }
 
-func NewMediaPlayer() Player {
-	return &MediaPlayer{
-		buffers:       make(map[string]*beep.Buffer),
+// ReleaseAll frees all note sounds memory from buffer.
+func (mp *beepFacade) ReleaseAll() {
+	for key := range mp.buffers {
+		delete(mp.buffers, key)
+	}
+}
+
+func New() IMediaPlayer {
+	return &beepFacade{
+		buffers:       make(map[n.Note]*beep.Buffer),
 		isInitialised: false,
 	}
 }

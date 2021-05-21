@@ -1,16 +1,25 @@
 package main
 
 import (
+	"github.com/Joptim/music-rehearsal/mediaplayer"
+	n "github.com/Joptim/music-rehearsal/theory/note"
 	"log"
 	"time"
 )
 
 func main() {
 
-	notes := []string{"A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4"}
-	mp := NewMediaPlayer()
+	notesNames := []string{"A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4"}
+	notes := make([]n.Note, len(notesNames))
+	var err error
+	for i, name := range notesNames {
+		if notes[i], err = n.New(name); err != nil {
+			panic(err)
+		}
+	}
 
-	err := mp.Prepare(notes...)
+	mp := mediaplayer.New()
+	err = mp.Prepare(notes...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,8 +31,5 @@ func main() {
 
 	<-signal
 
-	err = mp.Release(notes...)
-	if err != nil {
-		log.Fatal(err)
-	}
+	mp.Release(notes...)
 }
