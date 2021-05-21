@@ -57,3 +57,11 @@ func New(code string) (Interval, error) {
 	}
 	return interval, nil
 }
+
+func NewOrPanic(code string) Interval {
+	interval, err := New(code)
+	if err != nil {
+		panic(err)
+	}
+	return interval
+}
